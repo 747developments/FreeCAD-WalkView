@@ -5,13 +5,13 @@ __author__      = "Radek Reznicek - 747Developments"
 __copyright__   = "Copyright 2021, 747Developments"
 __license__ = "GPL"
 __email__ = "support@747developments.com"
-__version__ = "1.0"
+__version__ = "1.1"
 
 import FreeCAD
 from PySide import QtGui, QtCore
 from pivy import coin
 import Part
-from math import sin, cos, pi
+from math import sin, cos, pi, atan
 import time
 import sys
 import random
@@ -48,7 +48,7 @@ class walkTroughView(QtGui.QDialog):
         self.x = cam_pos[0]
         self.y = cam_pos[1]
         self.z = cam_pos[2]
-        self.vector_view = (1,0,0)
+        self.vector_view = Gui.ActiveDocument.ActiveView.getViewDirection()
         # Set default values    
         self.walktrough_speed_mm = DEFAULT_WALKTROUGH_SPEED_MM_PER_KEYPRESS
         self.speed_increment = DEFAULT_WALKTROUGH_SPEED_MM_INCREMENT
@@ -58,13 +58,17 @@ class walkTroughView(QtGui.QDialog):
         self.elevation_increment = DEFAULT_ELEVATION_INCREMENT_DEG
         self.viewAroundState = DEFALUT_MOUSE_ACTIVE
         self.elevationFrozen = DEFALUT_ELEVATION_FROZEN
-        self.azimuth = 0.0
-        self.elevation = 0.0
+        
+        self.azimuth = 0.0  
+        self.elevation = 0.0      
+        if(self.vector_view[0] != 0):
+            self.azimuth = atan(self.vector_view[1]/self.vector_view[0])
+        if(self.vector_view[1] != 0):
+            self.elevation = atan(self.vector_view[2]/self.vector_view[1])
         self.d_az_init = 0.0
         self.d_el_init = 0.0
         self.d_az = 0.0
         self.d_el = 0.0
-        self.counter = -1
 
         self.pressed_keys = []
        
@@ -220,24 +224,13 @@ class walkTroughView(QtGui.QDialog):
                     self.d_az = int( pos[0] )
                     self.d_el = int( pos[1] )
 
-                    if(self.counter < 0):
-                        self.azimuth = self.azimuth - self.d_az*(self.mouse_speed/MOUSE_SPEED_DIVIDER)
-                        self.elevation = self.elevation - self.d_el *(self.mouse_speed/MOUSE_SPEED_DIVIDER)
-                    elif(self.counter < 1):
-                        self.azimuth = self.azimuth
-                        self.elevation = self.elevation
-                    else:    
-                        self.azimuth = self.azimuth + ( self.d_az_init - self.d_az )*(self.mouse_speed/MOUSE_SPEED_DIVIDER)
-                        self.elevation = self.elevation + ( self.d_el_init - self.d_el )*(self.mouse_speed/MOUSE_SPEED_DIVIDER)
+                    self.azimuth = self.azimuth + ( self.d_az_init - self.d_az )*(self.mouse_speed/MOUSE_SPEED_DIVIDER)
+                    self.elevation = self.elevation + ( self.d_el_init - self.d_el )*(self.mouse_speed/MOUSE_SPEED_DIVIDER)
                     
                     self.d_az_init = self.d_az
                     self.d_el_init = self.d_el
-
+    
                     self.updateViewVector()
-
-                    self.counter += 1
-                    if(self.counter > 1):
-                        self.counter = 1
 
             # If mouse motion is FROZEN only update the camera position
             else:
@@ -246,8 +239,6 @@ class walkTroughView(QtGui.QDialog):
                 self.x = self.cam_pos[0]
                 self.y = self.cam_pos[1]
                 self.z = self.cam_pos[2]
-                #self.vector_view = (1,0,0)
-                self.counter = 0
 
         except Exception as ex:
             print("Exception happened during mouse motion update: %s" % (ex))
@@ -258,7 +249,7 @@ class walkTroughView(QtGui.QDialog):
         self.vector_view = (       self.cam_pos[0] + cos( self.azimuth ),
                                             self.cam_pos[1] + sin( self.azimuth ),
                                             self.cam_pos[2] + sin( self.elevation ) )
-        
+
         self.cam.pointAt( coin.SbVec3f(   self.vector_view[0], 
                                                         self.vector_view[1],
                                                         self.vector_view[2]),
@@ -534,6 +525,16 @@ def main():
         actView=Gui.activeDocument().activeView()
     except Exception as ex:
         print("Unable get ACTIVE VIEW - Make sure you have document opened: %s" % (ex))
+        flag_open_view = False
+        closeMessage()
+        return
+
+    try:
+        print("Setting TOP working plane X-Y")
+        FreeCAD.DraftWorkingPlane.setTop()
+        FreeCADGui.Snapper.setGrid()
+    except Exception as ex:
+        print("Unable to set Top X-Y working plane: %s" % (ex))
         flag_open_view = False
         closeMessage()
         return
