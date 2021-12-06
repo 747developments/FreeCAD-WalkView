@@ -7,6 +7,8 @@ Note that pressing the controls migh interfere with FreeCAD shortcuts. For the b
 *** If you want to support the development you can for example buy me a coffee with the link below ***
 https://www.buymeacoffee.com/747developments
 
+You can watch the short demonstration: https://youtu.be/WeQUO-4tZM0
+
 ## Features:
 * W, S, A, D control like game
 * Freeze/unfreeze mouse movement
