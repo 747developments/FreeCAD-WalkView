@@ -9,6 +9,10 @@ https://www.buymeacoffee.com/747developments
 
 You can watch the short demonstration: https://youtu.be/WeQUO-4tZM0
 
+![Alt text](Image_screen01.PNG?raw=true "Screen")
+
+![Alt text](Image_screen02.PNG?raw=true "Screen Full")
+
 ## Features:
 * W, S, A, D control like game
 * Freeze/unfreeze mouse movement
