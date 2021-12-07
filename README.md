@@ -1,5 +1,5 @@
-# FreeCAD - WalkView by 747Developments
-Walk / Fly Navigation for FreeCAD Perspective view
+# FreeCAD - Walk-Fly mode by 747Developments
+Walk - Fly Navigation for FreeCAD Perspective view
 
 This macro is written in Python and tested with FreeCAD 0.19. Walk / Fly navigation around or trough objects in FreeCAD. Use W, S, A, D, mouse and arrows to navigate. Not all the features might work well in all versions.
 Note that pressing the controls migh interfere with FreeCAD shortcuts. For the best experience you should disable shortcuts which uses the same keys as this macro.
